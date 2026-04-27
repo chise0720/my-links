@@ -1,0 +1,272 @@
+import React, { useState, useEffect } from 'react';
+import { Mail, Phone, MessageCircle, MapPin, Train, ShoppingCart, School, Trees, ShieldCheck, Thermometer, Zap, Car, Heart, ArrowRight, Menu } from 'lucide-react';
+
+const apiKey = "";
+
+const App = () => {
+  const [images, setImages] = useState({
+    hero: null,
+    station: null,
+    shopping: null,
+    school: null,
+    park: null,
+    lotMap: null,
+    floorPlan: null,
+    mascot: null
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  const fetchImage = async (prompt, key) => {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+    const payload = {
+      instances: [{ prompt: prompt }],
+      parameters: { sampleCount: 1 }
+    };
+
+    let delay = 1000;
+    for (let i = 0; i < 5; i++) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+          const result = await response.json();
+          const base64Data = result.predictions[0].bytesBase64Encoded;
+          setImages(prev => ({ ...prev, [key]: `data:image/png;base64,${base64Data}` }));
+          return;
+        }
+      } catch (err) {
+        // Retry logic handled by delay
+      }
+      await new Promise(resolve => setTimeout(resolve, delay));
+      delay *= 2;
+    }
+  };
+
+  useEffect(() => {
+    const generateAll = async () => {
+      setLoading(true);
+      await Promise.all([
+        fetchImage("Modern high-end Japanese suburban house exterior, minimalist white walls and wood accents, beautiful small garden, bright blue sky, wide angle professional architectural photography.", "hero"),
+        fetchImage("A modern and clean Japanese suburban train station entrance, bright morning light, professional photography.", "station"),
+        fetchImage("Stylish modern Japanese supermarket interior, fresh produce section, warm bright lighting, high quality.", "shopping"),
+        fetchImage("Modern Japanese elementary school building, clean architecture, safe and welcoming atmosphere, daylight.", "school"),
+        fetchImage("Lush green public park with a modern wooden playground, sunny afternoon, soft lighting.", "park"),
+        fetchImage("A clean, stylized 3D architectural site plan illustration of a 6-lot residential development, top-down isometric view.", "lotMap"),
+        fetchImage("A clean, modern 3D architectural floor plan of a 4LDK house, isometric view, bright and clear design.", "floorPlan"),
+        fetchImage("A cute and friendly simple 2D mascot character for a real estate company, a small bird wearing a tiny house-shaped hat, vector style, white background.", "mascot")
+      ]);
+      setLoading(false);
+    };
+
+    generateAll();
+  }, []);
+
+  const RevealOnScroll = ({ children }) => {
+    return <div className="opacity-100 transition-all duration-1000">{children}</div>;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f9f8f4]">
+        <div className="w-16 h-16 border-4 border-[#2d5a4c] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-[#2d5a4c] font-bold animate-pulse">AIが理想の住まいの画像を生成中...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="font-sans text-[#333] bg-[#f9f8f4] selection:bg-[#4a7c6a] selection:text-white">
+      {/* Header */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            {images.mascot && <img src={images.mascot} alt="Mascot" className="h-10 w-10 rounded-full" />}
+            <div className="flex flex-col">
+              <span className="text-[10px] tracking-[0.2em] text-[#2d5a4c] font-bold">HARMONY HOME</span>
+              <span className="text-lg md:text-xl font-serif font-bold text-[#2d5a4c] leading-none">ハーモニーホーム</span>
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-6">
+            <a href="tel:0120123456" className="flex items-center gap-2 text-[#2d5a4c] font-bold">
+              <Phone className="h-4 w-4" /> 0120-123-456
+            </a>
+            <button className="bg-[#4a7c6a] text-white px-6 py-3 rounded-full font-bold hover:bg-[#2d5a4c] transition-all shadow-lg shadow-[#4a7c6a]/20">来場予約する</button>
+          </div>
+          <button className="md:hidden text-[#2d5a4c]">
+            <Menu className="h-8 w-8" />
+          </button>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative pt-16 md:pt-20 overflow-hidden bg-white">
+        <div className="flex flex-col lg:flex-row min-h-[600px] md:min-h-[800px]">
+          <div className="w-full lg:w-5/12 flex items-center px-6 py-12 md:px-12 lg:px-20 z-10 bg-white">
+            <div className="max-w-xl">
+              <div className="inline-block px-3 py-1 bg-[#e9f0ee] text-[#2d5a4c] text-xs font-bold mb-6 tracking-wider rounded">NEW PROJECT</div>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-[#2d5a4c] leading-[1.3] mb-6">
+                子育てしやすい街で、<br />
+                <span className="text-[#b89d5d]">月々2万円台</span>からの<br />
+                新生活。
+              </h1>
+              <p className="text-base md:text-lg text-gray-600 mb-10 leading-relaxed">
+                駅・学校・買い物施設が徒歩圏。<br className="hidden md:block" />
+                家族にうれしい全6区画のプレミアム分譲住宅。
+              </p>
+              
+              <div className="flex flex-wrap gap-4 mb-10">
+                <div className="bg-[#f9f8f4] border border-[#b89d5d]/30 px-6 py-4 rounded-lg">
+                  <span className="block text-[10px] text-[#b89d5d] font-bold">販売価格</span>
+                  <span className="text-xl md:text-2xl font-serif font-bold text-[#2d5a4c]">1,000万円台〜</span>
+                </div>
+                <div className="bg-[#f9f8f4] border border-[#b89d5d]/30 px-6 py-4 rounded-lg">
+                  <span className="block text-[10px] text-[#b89d5d] font-bold">月々お支払い</span>
+                  <span className="text-xl md:text-2xl font-serif font-bold text-[#2d5a4c]">2万円台〜</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="bg-[#4a7c6a] text-white px-10 py-5 rounded-xl font-bold text-lg hover:bg-[#2d5a4c] transition-all shadow-xl shadow-[#4a7c6a]/30">来場予約する</button>
+                <button className="bg-gray-100 text-gray-700 px-8 py-5 rounded-xl font-bold">資料請求</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-7/12 relative min-h-[400px]">
+            <img src={images.hero} alt="Main House" className="w-full h-full object-cover" />
+            <div className="absolute top-8 right-8 animate-bounce">
+              <div className="bg-[#b89d5d] text-white p-4 rounded-full w-28 h-28 flex flex-col items-center justify-center text-center shadow-2xl border-4 border-white rotate-[-5deg]">
+                <span className="text-[10px] font-bold leading-none">WEB予約限定</span>
+                <span className="text-xs font-bold my-1">QUOカード</span>
+                <span className="text-xl font-bold">5,000<span className="text-xs">円</span></span>
+                <span className="text-[8px]">プレゼント</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Merits */}
+      <section className="py-20 bg-[#f9f8f4]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-serif font-bold text-[#2d5a4c] mb-2">Comfortable Life</h2>
+            <p className="text-gray-400 text-sm tracking-widest">子育て家族に選ばれる理由</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <MeritCard img={images.station} icon={<Train />} title="駅近で通勤ラク" text="最寄り駅まで徒歩圏内。忙しい朝の時間を有効に活用できます。" />
+            <MeritCard img={images.shopping} icon={<ShoppingCart />} title="買い物徒歩圏" text="スーパーやドラッグストアが近く、毎日の買い出しがスムーズに。" />
+            <MeritCard img={images.school} icon={<School />} title="学校が近い" text="小中学校への通学路も安心。お子様の自立を優しく支えます。" />
+            <MeritCard img={images.park} icon={<Trees />} title="公園が身近" text="休日は家族でピクニック。自然に触れる豊かな日常が広がります。" />
+          </div>
+        </div>
+      </section>
+
+      {/* Plan Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#2d5a4c] mb-8">
+                ゆとりある設計で、<br />家族の未来を彩る。
+              </h2>
+              <div className="space-y-6">
+                <FeatureItem num="01" title="4LDK＋WICのゆとり" desc="全棟大容量収納完備" />
+                <FeatureItem num="02" title="駐車スペース2台確保" desc="来客時も安心" />
+                <FeatureItem num="03" title="全6区画の美しい街並み" desc="統一感のある外構" />
+                <FeatureItem num="04" title="前面道路 約6.0m" desc="車の出し入れもスムーズ" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-6">
+              <div className="bg-[#f0f2f1] rounded-3xl overflow-hidden shadow-inner border border-gray-100">
+                <img src={images.lotMap} alt="Lot Map" className="w-full h-64 object-cover opacity-80" />
+                <div className="p-4 text-center text-[#2d5a4c] font-bold text-sm bg-white/50 backdrop-blur-sm italic">Site Map</div>
+              </div>
+              <div className="bg-[#f0f2f1] rounded-3xl overflow-hidden shadow-inner border border-gray-100">
+                <img src={images.floorPlan} alt="Floor Plan" className="w-full h-64 object-cover opacity-80" />
+                <div className="p-4 text-center text-[#2d5a4c] font-bold text-sm bg-white/50 backdrop-blur-sm italic">Sample Floor Plan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Specs */}
+      <section className="py-20 bg-[#2d5a4c] text-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-3xl font-serif font-bold text-center mb-16">安心して長く暮らせる設備・仕様</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <SpecItem icon={<ShieldCheck />} title="耐震等級3" />
+            <SpecItem icon={<Thermometer />} title="高気密断熱" />
+            <SpecItem icon={<Zap />} title="最新省エネ" />
+            <SpecItem icon={<Car />} title="駐車2台可" />
+            <SpecItem icon={<Heart />} title="保証充実" />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-24 bg-[#b89d5d] text-white text-center relative overflow-hidden">
+        <div className="max-w-4xl mx-auto px-6 relative z-10">
+          <h2 className="text-3xl md:text-5xl font-serif font-bold mb-8">理想の家との出会いを、ここから。</h2>
+          <p className="text-lg mb-12 opacity-90">今ならWEB予約で5,000円分のQUOカードを進呈中！</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button className="bg-white text-[#2d5a4c] p-8 rounded-2xl font-bold text-2xl shadow-2xl hover:scale-105 transition-transform">来場予約する</button>
+            <button className="bg-[#06C755] text-white p-8 rounded-2xl font-bold text-2xl flex items-center justify-center gap-3 hover:scale-105 transition-transform shadow-2xl">
+              <MessageCircle /> LINEで相談
+            </button>
+          </div>
+          <div className="mt-12">
+            <p className="text-sm opacity-70 mb-2">お電話でのお問い合わせ</p>
+            <p className="text-4xl md:text-6xl font-serif font-bold tracking-tighter">0120-123-456</p>
+          </div>
+        </div>
+      </section>
+
+      <footer className="py-12 bg-white text-center border-t border-gray-100">
+        <p className="font-serif font-bold text-[#2d5a4c] text-xl">ハーモニーホーム</p>
+        <p className="text-[10px] text-gray-400 mt-2">© 2024 Harmony Home. All Rights Reserved.</p>
+      </footer>
+    </div>
+  );
+};
+
+const MeritCard = ({ img, icon, title, text }) => (
+  <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all">
+    <div className="h-48">
+      <img src={img} alt={title} className="w-full h-full object-cover" />
+    </div>
+    <div className="p-8 text-center">
+      <div className="w-12 h-12 bg-[#e9f0ee] rounded-full flex items-center justify-center mx-auto mb-4 text-[#2d5a4c]">
+        {icon}
+      </div>
+      <h3 className="font-bold mb-3">{title}</h3>
+      <p className="text-xs text-gray-500 leading-relaxed">{text}</p>
+    </div>
+  </div>
+);
+
+const FeatureItem = ({ num, title, desc }) => (
+  <div className="flex items-center gap-4 border-b border-gray-100 pb-4">
+    <span className="text-[#b89d5d] font-serif font-bold text-xl italic">{num}</span>
+    <div className="flex-1">
+      <p className="font-bold">{title}</p>
+      <p className="text-xs text-gray-400">{desc}</p>
+    </div>
+    <ArrowRight className="h-4 w-4 text-gray-300" />
+  </div>
+);
+
+const SpecItem = ({ icon, title }) => (
+  <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 text-center hover:bg-white/20 transition-all">
+    <div className="mb-3 text-[#b89d5d] flex justify-center">{icon}</div>
+    <p className="text-xs font-bold">{title}</p>
+  </div>
+);
+
+export default App;
